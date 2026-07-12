@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { prisma } from '../lib/prisma';
 import { requireAdmin, requireManager, AuthenticatedRequest } from '../middleware/auth';
-import { notifyComplianceIssue } from '../lib/notifications';
+import { notifyComplianceIssue } from '../lib/notification';
 
 const router = Router();
 

@@ -19,7 +19,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 app.use(cors({
-  origin: true,
+  origin: ['http://localhost:3000', 'http://127.0.0.1:3000', process.env.FRONTEND_URL!],
   credentials: true,
 }));
 app.use(express.json());
@@ -38,3 +38,6 @@ app.use('/api', settingsRouter);
 app.listen(PORT, () => {
   console.log(`🚀 EcoSphere API Server running on port ${PORT}`);
 });
+
+
+app.listen(4000, () => console.log("Server running on 4000"));
