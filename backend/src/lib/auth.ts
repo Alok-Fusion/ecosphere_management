@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { cookies } from 'next/headers';
+import { Request } from 'express';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'ecosphere-default-secret';
 
@@ -11,11 +11,11 @@ export interface JWTPayload {
   name: string;
 }
 
-export async function hashPassword(password: string): Promise<string> {
+export function hashPassword(password: string): string {
   return bcrypt.hashSync(password, 10);
 }
 
-export async function verifyPassword(password: string, hash: string): Promise<boolean> {
+export function verifyPassword(password: string, hash: string): boolean {
   return bcrypt.compareSync(password, hash);
 }
 
@@ -31,9 +31,8 @@ export function verifyToken(token: string): JWTPayload | null {
   }
 }
 
-export async function getSession(): Promise<JWTPayload | null> {
-  const cookieStore = await cookies();
-  const token = cookieStore.get('token')?.value;
+export function getSession(req: Request): JWTPayload | null {
+  const token = req.cookies?.token;
   if (!token) return null;
   return verifyToken(token);
 }

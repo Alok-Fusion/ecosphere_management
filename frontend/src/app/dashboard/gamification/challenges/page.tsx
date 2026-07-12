@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 
 interface Challenge { id: number; title: string; description: string; xp: number; difficulty: string; deadline: string; status: string; evidenceRequired: boolean; }
 const statuses = ['All', 'Draft', 'Active', 'UnderReview', 'Completed', 'Archived'];
@@ -10,8 +11,12 @@ export default function ChallengesPage() {
   const [filter, setFilter] = useState('All');
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState({ title: '', description: '', xp: '100', difficulty: 'Medium', deadline: '', evidenceRequired: false, status: 'Draft' });
+  const [userRole, setUserRole] = useState<string>('Employee');
 
-  useEffect(() => { fetch('/api/challenges').then(r => r.json()).then(setChallenges); }, []);
+  useEffect(() => {
+    fetch('/api/challenges').then(r => r.json()).then(setChallenges);
+    fetch('/api/auth/me').then(r => r.json()).then(d => { if (d.user?.role) setUserRole(d.user.role); });
+  }, []);
 
   const filtered = filter === 'All' ? challenges : challenges.filter(c => c.status === filter);
 
@@ -30,7 +35,9 @@ export default function ChallengesPage() {
     <div>
       <div className="page-header">
         <div><h1 className="page-title">Challenges</h1><p className="page-subtitle">Sustainability challenges with XP rewards</p></div>
-        <button className="btn btn-orange" onClick={() => setShowModal(true)}>+ New Challenge</button>
+        {userRole !== 'Employee' && (
+          <button className="btn btn-orange" onClick={() => setShowModal(true)}>+ New Challenge</button>
+        )}
       </div>
 
       <div className="tab-pills">
@@ -46,12 +53,14 @@ export default function ChallengesPage() {
             </div>
             <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: '0 0 14px', lineHeight: 1.6 }}>{c.description}</p>
             <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '14px' }}>
-              <span className="badge badge-orange">⚡ {c.xp} XP</span>
+              <span className="badge badge-orange">{c.xp} XP</span>
               <span className={`badge ${difficultyColors[c.difficulty] || 'badge-gray'}`}>{c.difficulty}</span>
-              <span className="badge badge-gray">📅 {new Date(c.deadline).toLocaleDateString()}</span>
-              {c.evidenceRequired && <span className="badge badge-yellow">📎 Evidence</span>}
+              <span className="badge badge-gray">Deadline: {new Date(c.deadline).toLocaleDateString()}</span>
+              {c.evidenceRequired && <span className="badge badge-yellow">Evidence Required</span>}
             </div>
-            {c.status === 'Active' && <button className="btn btn-orange btn-sm" onClick={() => handleJoin(c.id)}>🏆 Join Challenge</button>}
+            <Link href={`/dashboard/gamification/challenges/${c.id}`} className="btn btn-orange btn-sm" style={{ textDecoration: 'none', display: 'inline-block', textAlign: 'center' }}>
+              View Details
+            </Link>
           </div>
         ))}
       </div>

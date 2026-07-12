@@ -9,10 +9,21 @@ export default function CompliancePage() {
   const [depts, setDepts] = useState<{id:number;name:string}[]>([]);
   const [form, setForm] = useState({ title: '', severity: 'Medium', departmentId: '', ownerId: '', dueDate: '' });
   const [error, setError] = useState('');
+  const [userRole, setUserRole] = useState<string>('Employee');
+  const [userDeptId, setUserDeptId] = useState<number | null>(null);
 
   useEffect(() => {
     fetch('/api/compliance-issues').then(r => r.json()).then(setIssues);
     fetch('/api/departments').then(r => r.json()).then(setDepts);
+    fetch('/api/auth/me').then(r => r.json()).then(d => {
+      if (d.user) {
+        setUserRole(d.user.role);
+        if (d.user.departmentId) {
+          setUserDeptId(d.user.departmentId);
+          setForm(f => ({ ...f, departmentId: String(d.user.departmentId) }));
+        }
+      }
+    });
   }, []);
 
   const handleCreate = async () => {
@@ -33,11 +44,23 @@ export default function CompliancePage() {
     <div>
       <div className="page-header">
         <div><h1 className="page-title">Compliance Issues</h1><p className="page-subtitle">Track and resolve compliance issues</p></div>
-        <button className="btn btn-purple" onClick={() => setShowModal(true)}>+ New Issue</button>
+        {userRole !== 'Employee' && (
+          <button className="btn btn-purple" onClick={() => setShowModal(true)}>+ New Issue</button>
+        )}
       </div>
       <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
         <table className="data-table">
-          <thead><tr><th>Issue</th><th>Severity</th><th>Department</th><th>Owner</th><th>Due Date</th><th>Status</th><th>Actions</th></tr></thead>
+          <thead>
+            <tr>
+              <th>Issue</th>
+              <th>Severity</th>
+              <th>Department</th>
+              <th>Owner</th>
+              <th>Due Date</th>
+              <th>Status</th>
+              {userRole !== 'Employee' && <th>Actions</th>}
+            </tr>
+          </thead>
           <tbody>
             {issues.map(i => (
               <tr key={i.id}>
@@ -52,9 +75,11 @@ export default function CompliancePage() {
                     {i.isOverdue && <span className="badge badge-red">⚠ OVERDUE</span>}
                   </div>
                 </td>
-                <td>
-                  {i.status === 'Open' && <button className="btn btn-primary btn-sm" onClick={() => handleResolve(i.id)}>Resolve</button>}
-                </td>
+                {userRole !== 'Employee' && (
+                  <td>
+                    {i.status === 'Open' && <button className="btn btn-primary btn-sm" onClick={() => handleResolve(i.id)}>Resolve</button>}
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>
@@ -68,7 +93,24 @@ export default function CompliancePage() {
             {error && <div style={{ padding: '10px', borderRadius: '8px', background: 'rgba(239,68,68,0.1)', color: '#ef4444', fontSize: '13px', marginBottom: '14px' }}>{error}</div>}
             <div className="form-group"><label className="form-label">Title</label><input className="form-input" value={form.title} onChange={e => setForm({...form, title: e.target.value})} /></div>
             <div className="form-group"><label className="form-label">Severity</label><select className="form-select" value={form.severity} onChange={e => setForm({...form, severity: e.target.value})}><option>Low</option><option>Medium</option><option>High</option><option>Critical</option></select></div>
-            <div className="form-group"><label className="form-label">Department</label><select className="form-select" value={form.departmentId} onChange={e => setForm({...form, departmentId: e.target.value})}><option value="">Select...</option>{depts.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}</select></div>
+            <div className="form-group">
+              <label className="form-label">Department</label>
+              <select
+                className="form-select"
+                value={form.departmentId}
+                onChange={e => setForm({...form, departmentId: e.target.value})}
+                disabled={userRole === 'Manager'}
+              >
+                {userRole === 'Manager' ? (
+                  depts.filter(d => d.id === userDeptId).map(d => <option key={d.id} value={d.id}>{d.name}</option>)
+                ) : (
+                  <>
+                    <option value="">Select...</option>
+                    {depts.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
+                  </>
+                )}
+              </select>
+            </div>
             <div className="form-group"><label className="form-label">Owner (User ID) *</label><input type="number" className="form-input" value={form.ownerId} onChange={e => setForm({...form, ownerId: e.target.value})} placeholder="Required" /></div>
             <div className="form-group"><label className="form-label">Due Date *</label><input type="date" className="form-input" value={form.dueDate} onChange={e => setForm({...form, dueDate: e.target.value})} /></div>
             <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>

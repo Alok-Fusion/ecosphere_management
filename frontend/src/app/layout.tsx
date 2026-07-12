@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "EcoSphere - ESG Management Platform",
-  description: "Gamified ESG management platform for sustainable business operations.",
+  title: "EcoSphere — ESG Management Platform",
+  description: "Gamified ESG (Environmental, Social, Governance) Management Platform for sustainable business operations.",
 };
 
 export default function RootLayout({

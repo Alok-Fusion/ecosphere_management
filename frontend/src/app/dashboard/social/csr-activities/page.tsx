@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 
 interface Activity { id: number; title: string; icon: string; description: string; joinCount: number; evidenceRequired: boolean; status: string; category?: { name: string } }
 
@@ -7,8 +8,12 @@ export default function CSRActivitiesPage() {
   const [activities, setActivities] = useState<Activity[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState({ title: '', description: '', icon: '🌱', evidenceRequired: false });
+  const [userRole, setUserRole] = useState<string>('Employee');
 
-  useEffect(() => { fetch('/api/csr-activities').then(r => r.json()).then(setActivities); }, []);
+  useEffect(() => {
+    fetch('/api/csr-activities').then(r => r.json()).then(setActivities);
+    fetch('/api/auth/me').then(r => r.json()).then(d => { if (d.user?.role) setUserRole(d.user.role); });
+  }, []);
 
   const handleCreate = async () => {
     const res = await fetch('/api/csr-activities', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) });
@@ -24,7 +29,9 @@ export default function CSRActivitiesPage() {
     <div>
       <div className="page-header">
         <div><h1 className="page-title">CSR Activities</h1><p className="page-subtitle">Community & social responsibility programs</p></div>
-        <button className="btn btn-blue" onClick={() => setShowModal(true)}>+ New Activity</button>
+        {userRole !== 'Employee' && (
+          <button className="btn btn-blue" onClick={() => setShowModal(true)}>+ New Activity</button>
+        )}
       </div>
 
       <div className="card-grid">
@@ -39,11 +46,13 @@ export default function CSRActivitiesPage() {
             </div>
             <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: '0 0 14px', lineHeight: 1.6 }}>{a.description}</p>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '14px' }}>
-              <span className="badge badge-blue">👥 {a.joinCount} joined</span>
-              {a.evidenceRequired && <span className="badge badge-yellow">📎 Evidence Required</span>}
+              <span className="badge badge-blue">{a.joinCount} joined</span>
+              {a.evidenceRequired && <span className="badge badge-yellow">Evidence Required</span>}
               <span className={`badge ${a.status === 'Open' ? 'badge-green' : 'badge-gray'}`}>{a.status}</span>
             </div>
-            <button className="btn btn-blue btn-sm" onClick={() => handleJoin(a.id)} disabled={a.status !== 'Open'}>Join Activity</button>
+            <Link href={`/dashboard/social/csr-activities/${a.id}`} className="btn btn-blue btn-sm" style={{ textDecoration: 'none', display: 'inline-block', textAlign: 'center' }}>
+              View Details
+            </Link>
           </div>
         ))}
       </div>
@@ -54,7 +63,7 @@ export default function CSRActivitiesPage() {
             <h2>New CSR Activity</h2>
             <div className="form-group"><label className="form-label">Title</label><input className="form-input" value={form.title} onChange={e => setForm({...form, title: e.target.value})} /></div>
             <div className="form-group"><label className="form-label">Description</label><textarea className="form-textarea" value={form.description} onChange={e => setForm({...form, description: e.target.value})} /></div>
-            <div className="form-group"><label className="form-label">Icon (emoji)</label><input className="form-input" value={form.icon} onChange={e => setForm({...form, icon: e.target.value})} /></div>
+            <div className="form-group"><label className="form-label">Icon (text or symbol)</label><input className="form-input" value={form.icon} onChange={e => setForm({...form, icon: e.target.value})} /></div>
             <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <div className={`toggle-switch ${form.evidenceRequired ? 'active' : ''}`} onClick={() => setForm({...form, evidenceRequired: !form.evidenceRequired})} />
               <label className="form-label" style={{ margin: 0 }}>Evidence Required</label>

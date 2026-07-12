@@ -1,52 +1,16 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
-  BarChart,
-  Bar,
-  CartesianGrid,
-  Line,
-  LineChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
+  LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts';
-import {
-  Activity,
-  BarChart3,
-  Bot,
-  Building2,
-  FileBarChart,
-  Leaf,
-  ListChecks,
-  RefreshCw,
-  Sparkles,
-  Trophy,
-  UsersRound,
-} from 'lucide-react';
 
 interface DashboardData {
   kpis: { environmental: number; social: number; governance: number; overall: number };
   emissionsTrend: { month: string; emissions: number }[];
-  departmentRanking: { name: string; score: number; environmental: number; social: number; governance: number }[];
+  departmentRanking: { name: string; score: number }[];
   recentActivity: { type: string; text: string; status: string; time: string }[];
-}
-
-const statusClass: Record<string, string> = {
-  Approved: 'badge-green',
-  Pending: 'badge-yellow',
-  Rejected: 'badge-red',
-  Open: 'badge-red',
-  Resolved: 'badge-green',
-  Completed: 'badge-blue',
-};
-
-function monthLabel(value: string) {
-  const [, month] = value.split('-');
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  return months[Number(month) - 1] || value;
 }
 
 export default function DashboardPage() {
@@ -55,20 +19,17 @@ export default function DashboardPage() {
   const [insightLoading, setInsightLoading] = useState(false);
 
   useEffect(() => {
-    fetch('/api/dashboard')
-      .then((response) => response.json())
-      .then(setData)
-      .catch(console.error);
+    fetch('/api/dashboard').then(r => r.json()).then(setData).catch(console.error);
   }, []);
 
   const generateInsight = async () => {
     setInsightLoading(true);
     try {
-      const response = await fetch('/api/insights/generate', { method: 'POST' });
-      const result = await response.json();
-      setInsight(result.insight || result.error || 'Unable to generate insight.');
+      const res = await fetch('/api/insights/generate', { method: 'POST' });
+      const d = await res.json();
+      setInsight(d.insight || d.error || 'Unable to generate insight');
     } catch {
-      setInsight('Failed to connect to the AI insight service.');
+      setInsight('Failed to connect to AI service.');
     } finally {
       setInsightLoading(false);
     }
@@ -80,15 +41,12 @@ export default function DashboardPage() {
         <div className="page-header">
           <div>
             <h1 className="page-title">Dashboard</h1>
-            <p className="page-subtitle">ESG performance overview</p>
+            <p className="page-subtitle">ESG Performance Overview</p>
           </div>
         </div>
         <div className="kpi-grid">
-          {[1, 2, 3, 4].map((item) => (
-            <div key={item} className="kpi-tile">
-              <div className="skeleton" style={{ height: '18px', width: '110px', marginBottom: '18px' }} />
-              <div className="skeleton" style={{ height: '42px', width: '86px' }} />
-            </div>
+          {[1,2,3,4].map(i => (
+            <div key={i} className="kpi-tile"><div className="skeleton" style={{height:'60px',width:'120px'}} /></div>
           ))}
         </div>
       </div>
@@ -102,24 +60,22 @@ export default function DashboardPage() {
       <div className="page-header">
         <div>
           <h1 className="page-title">Dashboard</h1>
-          <p className="page-subtitle">ESG performance overview across environment, social, governance, and engagement.</p>
+          <p className="page-subtitle">ESG Performance Overview</p>
         </div>
-        <div className="page-actions">
-          <Link href="/dashboard/environmental/carbon-transactions" className="btn btn-primary">
-            <Leaf size={16} />
-            Log Carbon Data
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <Link href="/dashboard/environmental/carbon-transactions" className="btn btn-primary" style={{ textDecoration: 'none' }}>
+            + Log Carbon Data
           </Link>
-          <Link href="/dashboard/gamification/challenges" className="btn btn-orange">
-            <Trophy size={16} />
+          <Link href="/dashboard/gamification/challenges" className="btn btn-orange" style={{ textDecoration: 'none' }}>
             Start Challenge
           </Link>
-          <Link href="/dashboard/reports" className="btn btn-secondary">
-            <FileBarChart size={16} />
+          <Link href="/dashboard/reports" className="btn btn-secondary" style={{ textDecoration: 'none' }}>
             View Reports
           </Link>
         </div>
       </div>
 
+      {/* KPI Tiles */}
       <div className="kpi-grid">
         <div className="kpi-tile green">
           <div className="kpi-label">Environmental</div>
@@ -139,96 +95,99 @@ export default function DashboardPage() {
         </div>
       </div>
 
+      {/* AI Insight */}
       <div className="insight-card">
-        <h3 style={{ display: 'flex', alignItems: 'center', gap: '9px' }}>
-          <Bot size={18} />
-          AI ESG Insight
-        </h3>
+        <h3>AI Insight Generator</h3>
         {insight ? (
           <div>
             <p className="insight-text">{insight}</p>
-            <button className="btn btn-secondary btn-sm" type="button" onClick={generateInsight} disabled={insightLoading} style={{ marginTop: '16px' }}>
-              <RefreshCw size={14} />
+            <button className="btn btn-secondary btn-sm" onClick={generateInsight} disabled={insightLoading} style={{ marginTop: '14px' }}>
               {insightLoading ? 'Regenerating...' : 'Regenerate'}
             </button>
           </div>
         ) : (
           <div>
-            <p className="insight-text">
-              Generate a concise analysis of current ESG health, weakest dimension, and one recommended action.
+            <p className="insight-text" style={{ color: 'var(--text-muted)' }}>
+              Click below to generate an AI-powered analysis of your ESG performance.
             </p>
-            <button className="btn btn-primary btn-sm" type="button" onClick={generateInsight} disabled={insightLoading} style={{ marginTop: '16px' }}>
-              <Sparkles size={14} />
+            <button className="btn btn-primary btn-sm" onClick={generateInsight} disabled={insightLoading} style={{ marginTop: '14px' }}>
               {insightLoading ? 'Generating...' : 'Generate Insight'}
             </button>
           </div>
         )}
       </div>
 
+      {/* Charts */}
       <div className="charts-grid">
         <div className="chart-card">
-          <h3 style={{ display: 'flex', alignItems: 'center', gap: '9px' }}>
-            <Activity size={17} />
-            Emissions Trend
-          </h3>
-          <ResponsiveContainer width="100%" height={300}>
+          <h3>Emissions Trend (12 Months)</h3>
+          <ResponsiveContainer width="100%" height={280}>
             <LineChart data={emissionsTrend}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--border-default)" />
-              <XAxis dataKey="month" tick={{ fill: 'var(--text-muted)', fontSize: 11 }} tickFormatter={monthLabel} />
-              <YAxis tick={{ fill: 'var(--text-muted)', fontSize: 11 }} />
-              <Tooltip
-                contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border-default)', borderRadius: '8px', color: 'var(--text-primary)' }}
-                labelStyle={{ color: 'var(--text-secondary)' }}
+              <CartesianGrid strokeDasharray="3 3" stroke="#2a2a3a" />
+              <XAxis
+                dataKey="month"
+                tick={{ fill: '#5a5a70', fontSize: 11 }}
+                tickFormatter={(v) => {
+                  const parts = v.split('-');
+                  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+                  return months[parseInt(parts[1])-1] || v;
+                }}
               />
-              <Line type="monotone" dataKey="emissions" stroke="var(--accent-green)" strokeWidth={3} dot={{ fill: 'var(--accent-green)', r: 4 }} />
+              <YAxis tick={{ fill: '#5a5a70', fontSize: 11 }} />
+              <Tooltip
+                contentStyle={{ background: '#16161e', border: '1px solid #2a2a3a', borderRadius: '8px', color: '#e8e8ed' }}
+                labelStyle={{ color: '#8b8b9e' }}
+              />
+              <Line type="monotone" dataKey="emissions" stroke="#22c55e" strokeWidth={2.5} dot={{ fill: '#22c55e', r: 4 }} />
             </LineChart>
           </ResponsiveContainer>
         </div>
 
         <div className="chart-card">
-          <h3 style={{ display: 'flex', alignItems: 'center', gap: '9px' }}>
-            <BarChart3 size={17} />
-            Department ESG Ranking
-          </h3>
-          <ResponsiveContainer width="100%" height={300}>
+          <h3>Department ESG Ranking</h3>
+          <ResponsiveContainer width="100%" height={280}>
             <BarChart data={departmentRanking} layout="vertical">
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--border-default)" />
-              <XAxis type="number" domain={[0, 100]} tick={{ fill: 'var(--text-muted)', fontSize: 11 }} />
-              <YAxis dataKey="name" type="category" tick={{ fill: 'var(--text-secondary)', fontSize: 12 }} width={104} />
-              <Tooltip contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border-default)', borderRadius: '8px', color: 'var(--text-primary)' }} />
-              <Bar dataKey="score" fill="var(--accent-blue)" radius={[0, 8, 8, 0]} barSize={24} />
+              <CartesianGrid strokeDasharray="3 3" stroke="#2a2a3a" />
+              <XAxis type="number" domain={[0, 100]} tick={{ fill: '#5a5a70', fontSize: 11 }} />
+              <YAxis dataKey="name" type="category" tick={{ fill: '#8b8b9e', fontSize: 12 }} width={100} />
+              <Tooltip
+                contentStyle={{ background: '#16161e', border: '1px solid #2a2a3a', borderRadius: '8px', color: '#e8e8ed' }}
+              />
+              <Bar dataKey="score" fill="#3b82f6" radius={[0, 6, 6, 0]} barSize={24} />
             </BarChart>
           </ResponsiveContainer>
         </div>
       </div>
 
+      {/* Recent Activity */}
       <div className="chart-card">
-        <h3 style={{ display: 'flex', alignItems: 'center', gap: '9px' }}>
-          <ListChecks size={17} />
-          Recent Activity
-        </h3>
+        <h3>Recent Activity</h3>
         <div className="activity-feed">
           {recentActivity.length === 0 ? (
-            <div className="empty-state">No recent activity</div>
-          ) : recentActivity.map((item, index) => {
-            const isParticipation = item.type === 'participation';
-            return (
-              <div key={`${item.time}-${index}`} className="activity-item">
-                <div
-                  className="activity-icon"
-                  style={{ background: isParticipation ? 'var(--accent-blue-dim)' : 'var(--accent-purple-dim)' }}
-                >
-                  {isParticipation ? <UsersRound size={17} /> : <Building2 size={17} />}
+            <p style={{ color: 'var(--text-muted)', fontSize: '13px' }}>No recent activity</p>
+          ) : (
+            recentActivity.map((item, i) => (
+              <div key={i} className="activity-item">
+                <div className="activity-icon" style={{
+                  background: item.type === 'participation' ? 'var(--accent-blue-dim)' :
+                    item.type === 'compliance' ? 'var(--accent-purple-dim)' : 'var(--accent-green-dim)',
+                }}>
+                  {item.type === 'participation' ? '👥' : item.type === 'compliance' ? '⚠️' : '📊'}
                 </div>
                 <div>
                   <div className="activity-text">{item.text}</div>
                   <div className="activity-time">
-                    <span className={`badge ${statusClass[item.status] || 'badge-gray'}`}>{item.status}</span>
+                    <span className={`badge ${
+                      item.status === 'Approved' ? 'badge-green' :
+                      item.status === 'Pending' ? 'badge-yellow' :
+                      item.status === 'Open' ? 'badge-red' :
+                      item.status === 'Resolved' ? 'badge-green' : 'badge-gray'
+                    }`}>{item.status}</span>
                   </div>
                 </div>
               </div>
-            );
-          })}
+            ))
+          )}
         </div>
       </div>
     </div>

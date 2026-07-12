@@ -9,12 +9,20 @@ export default function AuditsPage() {
   const [depts, setDepts] = useState<{id:number;name:string}[]>([]);
   const [users, setUsers] = useState<{id:number;name:string}[]>([]);
   const [form, setForm] = useState({ title: '', departmentId: '', auditorId: '', date: '', findings: '', status: 'UnderReview' });
+  const [userRole, setUserRole] = useState<string>('Employee');
+  const [userDeptId, setUserDeptId] = useState<number | null>(null);
 
   useEffect(() => {
     fetch('/api/audits').then(r => r.json()).then(setAudits);
     fetch('/api/departments').then(r => r.json()).then(setDepts);
-    fetch('/api/auth/me').then(r => r.json()).then(() => {
-      // For simplicity, fetch users from departments
+    fetch('/api/auth/me').then(r => r.json()).then(d => {
+      if (d.user) {
+        setUserRole(d.user.role);
+        if (d.user.departmentId) {
+          setUserDeptId(d.user.departmentId);
+          setForm(f => ({ ...f, departmentId: String(d.user.departmentId) }));
+        }
+      }
     });
   }, []);
 
@@ -27,7 +35,9 @@ export default function AuditsPage() {
     <div>
       <div className="page-header">
         <div><h1 className="page-title">Audits</h1><p className="page-subtitle">Internal and external audit records</p></div>
-        <button className="btn btn-purple" onClick={() => setShowModal(true)}>+ New Audit</button>
+        {userRole !== 'Employee' && (
+          <button className="btn btn-purple" onClick={() => setShowModal(true)}>+ New Audit</button>
+        )}
       </div>
       <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
         <table className="data-table">
@@ -52,7 +62,24 @@ export default function AuditsPage() {
           <div className="modal" onClick={e => e.stopPropagation()}>
             <h2>New Audit</h2>
             <div className="form-group"><label className="form-label">Title</label><input className="form-input" value={form.title} onChange={e => setForm({...form, title: e.target.value})} /></div>
-            <div className="form-group"><label className="form-label">Department</label><select className="form-select" value={form.departmentId} onChange={e => setForm({...form, departmentId: e.target.value})}><option value="">Select...</option>{depts.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}</select></div>
+            <div className="form-group">
+              <label className="form-label">Department</label>
+              <select
+                className="form-select"
+                value={form.departmentId}
+                onChange={e => setForm({...form, departmentId: e.target.value})}
+                disabled={userRole === 'Manager'}
+              >
+                {userRole === 'Manager' ? (
+                  depts.filter(d => d.id === userDeptId).map(d => <option key={d.id} value={d.id}>{d.name}</option>)
+                ) : (
+                  <>
+                    <option value="">Select...</option>
+                    {depts.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
+                  </>
+                )}
+              </select>
+            </div>
             <div className="form-group"><label className="form-label">Auditor ID</label><input type="number" className="form-input" value={form.auditorId} onChange={e => setForm({...form, auditorId: e.target.value})} placeholder="User ID" /></div>
             <div className="form-group"><label className="form-label">Date</label><input type="date" className="form-input" value={form.date} onChange={e => setForm({...form, date: e.target.value})} /></div>
             <div className="form-group"><label className="form-label">Findings</label><textarea className="form-textarea" value={form.findings} onChange={e => setForm({...form, findings: e.target.value})} /></div>

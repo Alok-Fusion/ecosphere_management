@@ -2,173 +2,150 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
-import type { LucideIcon } from 'lucide-react';
+import { useState, useEffect, type ReactNode } from 'react';
 import {
-  Award,
-  BarChart3,
-  Bell,
-  Building2,
-  ChevronDown,
-  ChevronRight,
-  ClipboardCheck,
-  ClipboardList,
-  FileBarChart,
-  FileCheck2,
-  Flag,
-  Gift,
-  Gauge,
-  Handshake,
-  Leaf,
-  LogOut,
-  Menu,
-  Moon,
-  PackageCheck,
-  Settings,
-  ShieldAlert,
-  Sun,
+  LayoutDashboard,
+  UserCircle,
+  Factory,
+  PackageSearch,
+  ArrowLeftRight,
   Target,
-  Trophy,
-  UserRound,
+  HeartHandshake,
+  Users,
+  PieChart,
+  ScrollText,
+  ClipboardCheck,
+  ShieldCheck,
+  AlertTriangle,
+  Swords,
   UsersRound,
-  X,
-  Zap,
+  Award,
+  Gift,
+  Trophy,
+  BarChart3,
+  Settings,
+  Sun,
+  Moon,
+  LogOut,
+  Leaf,
+  ChevronRight,
+  ChevronDown,
 } from 'lucide-react';
 
-type NavItem = {
-  label: string;
-  href: string;
-  icon: LucideIcon;
-  module: string;
+const ICON_SIZE = 16;
+
+const iconMap: Record<string, ReactNode> = {
+  'Dashboard':              <LayoutDashboard size={ICON_SIZE} />,
+  'User Profile':           <UserCircle size={ICON_SIZE} />,
+  'Emission Factors':       <Factory size={ICON_SIZE} />,
+  'Product ESG Profiles':   <PackageSearch size={ICON_SIZE} />,
+  'Carbon Transactions':    <ArrowLeftRight size={ICON_SIZE} />,
+  'Environmental Goals':    <Target size={ICON_SIZE} />,
+  'CSR Activities':         <HeartHandshake size={ICON_SIZE} />,
+  'Employee Participation': <Users size={ICON_SIZE} />,
+  'Diversity Dashboard':    <PieChart size={ICON_SIZE} />,
+  'Policies':               <ScrollText size={ICON_SIZE} />,
+  'Policy Acknowledgements':<ClipboardCheck size={ICON_SIZE} />,
+  'Audits':                 <ShieldCheck size={ICON_SIZE} />,
+  'Compliance Issues':      <AlertTriangle size={ICON_SIZE} />,
+  'Challenges':             <Swords size={ICON_SIZE} />,
+  'Challenge Participation':<UsersRound size={ICON_SIZE} />,
+  'Badges':                 <Award size={ICON_SIZE} />,
+  'Rewards':                <Gift size={ICON_SIZE} />,
+  'Leaderboard':            <Trophy size={ICON_SIZE} />,
+  'Reports':                <BarChart3 size={ICON_SIZE} />,
+  'Settings':               <Settings size={ICON_SIZE} />,
 };
 
-type NavSection = {
-  title: string | null;
-  items: NavItem[];
+const sectionIconMap: Record<string, ReactNode> = {
+  'Environmental': <Leaf size={14} />,
+  'Social':        <HeartHandshake size={14} />,
+  'Governance':    <ShieldCheck size={14} />,
+  'Gamification':  <Trophy size={14} />,
+  'Analytics':     <BarChart3 size={14} />,
+  'System':        <Settings size={14} />,
 };
 
-type UserSummary = {
-  name: string;
-  email: string;
-  role: string;
-};
-
-type Notification = {
-  id: number;
-  type: string;
-  message: string;
-  read: boolean;
-  createdAt: string;
-};
-
-const navSections: NavSection[] = [
+const navSections = [
   {
     title: null,
     items: [
-      { label: 'Dashboard', href: '/dashboard', icon: Gauge, module: 'dashboard' },
-      { label: 'User Profile', href: '/dashboard/profile', icon: UserRound, module: 'profile' },
+      { label: 'Dashboard', href: '/dashboard', module: 'dashboard' },
+      { label: 'User Profile', href: '/dashboard/profile', module: 'profile' },
     ],
   },
   {
     title: 'Environmental',
+    module: 'environmental',
     items: [
-      { label: 'Emission Factors', href: '/dashboard/environmental/emission-factors', icon: Zap, module: 'environmental' },
-      { label: 'Product ESG Profiles', href: '/dashboard/environmental/product-profiles', icon: PackageCheck, module: 'environmental' },
-      { label: 'Carbon Transactions', href: '/dashboard/environmental/carbon-transactions', icon: Building2, module: 'environmental' },
-      { label: 'Environmental Goals', href: '/dashboard/environmental/goals', icon: Target, module: 'environmental' },
+      { label: 'Emission Factors', href: '/dashboard/environmental/emission-factors', module: 'environmental' },
+      { label: 'Product ESG Profiles', href: '/dashboard/environmental/product-profiles', module: 'environmental' },
+      { label: 'Carbon Transactions', href: '/dashboard/environmental/carbon-transactions', module: 'environmental' },
+      { label: 'Environmental Goals', href: '/dashboard/environmental/goals', module: 'environmental' },
     ],
   },
   {
     title: 'Social',
+    module: 'social',
     items: [
-      { label: 'CSR Activities', href: '/dashboard/social/csr-activities', icon: Handshake, module: 'social' },
-      { label: 'Employee Participation', href: '/dashboard/social/participation', icon: UsersRound, module: 'social' },
-      { label: 'Diversity Dashboard', href: '/dashboard/social/diversity', icon: BarChart3, module: 'social' },
+      { label: 'CSR Activities', href: '/dashboard/social/csr-activities', module: 'social' },
+      { label: 'Employee Participation', href: '/dashboard/social/participation', module: 'social' },
+      { label: 'Diversity Dashboard', href: '/dashboard/social/diversity', module: 'social' },
     ],
   },
   {
     title: 'Governance',
+    module: 'governance',
     items: [
-      { label: 'Policies', href: '/dashboard/governance/policies', icon: ClipboardList, module: 'governance' },
-      { label: 'Policy Acknowledgements', href: '/dashboard/governance/acknowledgements', icon: FileCheck2, module: 'governance' },
-      { label: 'Audits', href: '/dashboard/governance/audits', icon: ClipboardCheck, module: 'governance' },
-      { label: 'Compliance Issues', href: '/dashboard/governance/compliance', icon: ShieldAlert, module: 'governance' },
+      { label: 'Policies', href: '/dashboard/governance/policies', module: 'governance' },
+      { label: 'Policy Acknowledgements', href: '/dashboard/governance/acknowledgements', module: 'governance' },
+      { label: 'Audits', href: '/dashboard/governance/audits', module: 'governance' },
+      { label: 'Compliance Issues', href: '/dashboard/governance/compliance', module: 'governance' },
     ],
   },
   {
     title: 'Gamification',
+    module: 'gamification',
     items: [
-      { label: 'Challenges', href: '/dashboard/gamification/challenges', icon: Trophy, module: 'gamification' },
-      { label: 'Challenge Participation', href: '/dashboard/gamification/participation', icon: Flag, module: 'gamification' },
-      { label: 'Badges', href: '/dashboard/gamification/badges', icon: Award, module: 'gamification' },
-      { label: 'Rewards', href: '/dashboard/gamification/rewards', icon: Gift, module: 'gamification' },
-      { label: 'Leaderboard', href: '/dashboard/gamification/leaderboard', icon: BarChart3, module: 'gamification' },
+      { label: 'Challenges', href: '/dashboard/gamification/challenges', module: 'gamification' },
+      { label: 'Challenge Participation', href: '/dashboard/gamification/participation', module: 'gamification' },
+      { label: 'Badges', href: '/dashboard/gamification/badges', module: 'gamification' },
+      { label: 'Rewards', href: '/dashboard/gamification/rewards', module: 'gamification' },
+      { label: 'Leaderboard', href: '/dashboard/gamification/leaderboard', module: 'gamification' },
     ],
   },
   {
     title: 'Analytics',
     items: [
-      { label: 'Reports', href: '/dashboard/reports', icon: FileBarChart, module: 'reports' },
+      { label: 'Reports', href: '/dashboard/reports', module: 'reports' },
     ],
   },
   {
     title: 'System',
     items: [
-      { label: 'Settings', href: '/dashboard/settings', icon: Settings, module: 'settings' },
+      { label: 'Settings', href: '/dashboard/settings', module: 'settings' },
     ],
   },
 ];
 
-function isActiveRoute(pathname: string, href: string) {
-  return pathname === href || (href !== '/dashboard' && pathname.startsWith(href));
-}
-
-function formatTime(value: string) {
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return '';
-  return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-}
-
 export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
-  const [user, setUser] = useState<UserSummary | null>(null);
+  const [user, setUser] = useState<{ name: string; email: string; role: string } | null>(null);
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [notificationsOpen, setNotificationsOpen] = useState(false);
-
-  const unreadCount = useMemo(
-    () => notifications.filter((item) => !item.read).length,
-    [notifications],
-  );
 
   useEffect(() => {
-    fetch('/api/auth/me')
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.user) setUser(data.user);
-      })
-      .catch(() => {});
+    fetch('/api/auth/me').then(r => r.json()).then(d => {
+      if (d.user) setUser(d.user);
+    }).catch(() => {});
 
-    fetch('/api/notifications')
-      .then((response) => (response.ok ? response.json() : []))
-      .then((data) => {
-        if (Array.isArray(data)) setNotifications(data);
-      })
-      .catch(() => {});
-
-    const savedTheme = localStorage.getItem('theme') as 'dark' | 'light' | null;
+    const savedTheme = localStorage.getItem('theme') as 'dark' | 'light';
     if (savedTheme) {
       setTheme(savedTheme);
       document.documentElement.setAttribute('data-theme', savedTheme);
     }
   }, []);
-
-  useEffect(() => {
-    setMobileOpen(false);
-  }, [pathname]);
 
   const toggleTheme = () => {
     const nextTheme = theme === 'dark' ? 'light' : 'dark';
@@ -178,7 +155,7 @@ export default function Sidebar() {
   };
 
   const toggleSection = (title: string) => {
-    setCollapsed((prev) => ({ ...prev, [title]: !prev[title] }));
+    setCollapsed(prev => ({ ...prev, [title]: !prev[title] }));
   };
 
   const handleLogout = async () => {
@@ -186,120 +163,114 @@ export default function Sidebar() {
     router.push('/');
   };
 
-  const markNotificationsRead = async () => {
-    await fetch('/api/notifications', { method: 'PATCH' }).catch(() => {});
-    setNotifications((items) => items.map((item) => ({ ...item, read: true })));
-  };
-
   return (
-    <>
-      <div className="mobile-topbar">
-        <button className="icon-button" type="button" onClick={() => setMobileOpen(true)} aria-label="Open navigation">
-          <Menu size={18} />
-        </button>
-        <Link href="/dashboard" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
-          <span className="brand-mark" style={{ width: '34px', height: '34px', borderRadius: '10px' }}>
-            <Leaf size={18} />
-          </span>
-          <span className="brand-title" style={{ fontSize: '15px' }}>EcoSphere</span>
-        </Link>
-        <button className="icon-button" type="button" onClick={toggleTheme} aria-label="Toggle theme">
-          {theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
-        </button>
+    <nav className="sidebar">
+      <div className="sidebar-logo">
+        <Leaf size={20} style={{ color: 'var(--accent-green)' }} />
+        <span>EcoSphere</span>
       </div>
 
-      {mobileOpen && <button className="mobile-scrim" type="button" aria-label="Close navigation" onClick={() => setMobileOpen(false)} />}
-
-      <div className="app-toolbar">
-        {notificationsOpen && (
-          <div className="notification-panel">
-            <div className="notification-panel-header">
-              <div style={{ fontWeight: 800 }}>Notifications</div>
-              <button className="btn btn-secondary btn-sm" type="button" onClick={markNotificationsRead}>
-                Mark read
-              </button>
-            </div>
-            <div className="notification-list">
-              {notifications.length === 0 ? (
-                <div className="empty-state" style={{ padding: '20px' }}>No notifications yet</div>
-              ) : notifications.map((item) => (
-                <div key={item.id} className={`notification-item ${item.read ? '' : 'unread'}`}>
-                  <p className="notification-message">{item.message}</p>
-                  <div className="notification-time">{item.type.replaceAll('_', ' ')} - {formatTime(item.createdAt)}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        <Link href="/dashboard/profile" className="user-card-link app-user-pill">
-          <span className="avatar">{user?.name?.charAt(0).toUpperCase() || '?'}</span>
-          <span className="app-user-copy">
-            <span className="user-name">{user?.name || 'Loading...'}</span>
-            <span className="user-role">{user?.role || 'Signed in'}</span>
-          </span>
-        </Link>
-
-        <button className="icon-button" type="button" onClick={() => setNotificationsOpen((value) => !value)} aria-label="Open notifications">
-          <Bell size={17} />
-          {unreadCount > 0 && <span className="notification-count">{unreadCount}</span>}
-        </button>
-        <button className="icon-button" type="button" onClick={toggleTheme} aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}>
-          {theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
-        </button>
-        <button className="icon-button" type="button" onClick={handleLogout} aria-label="Sign out">
-          <LogOut size={17} />
-        </button>
-      </div>
-
-      <nav className={`sidebar ${mobileOpen ? 'mobile-open' : ''}`} aria-label="Main navigation">
-        <div className="sidebar-logo">
-          <Link href="/dashboard" className="brand-mark" aria-label="EcoSphere dashboard">
-            <Leaf size={22} />
-          </Link>
-          <div style={{ minWidth: 0 }}>
-            <span className="brand-title">EcoSphere</span>
-            <span className="brand-subtitle">ESG cockpit</span>
-          </div>
-          <button className="icon-button sidebar-close" type="button" onClick={() => setMobileOpen(false)} aria-label="Close navigation" style={{ marginLeft: 'auto' }}>
-            <X size={16} />
-          </button>
-        </div>
-
-        <div className="sidebar-scroll">
-          {navSections.map((section, index) => {
-            const sectionKey = section.title || `root-${index}`;
-            const isCollapsed = collapsed[sectionKey];
-            return (
-              <div key={sectionKey} className="sidebar-section">
-                {section.title && (
-                  <button className="sidebar-section-title" type="button" onClick={() => toggleSection(sectionKey)}>
-                    <span>{section.title}</span>
-                    {isCollapsed ? <ChevronRight size={14} /> : <ChevronDown size={14} />}
-                  </button>
-                )}
-                {!isCollapsed && section.items.map((item) => {
-                  const Icon = item.icon;
-                  const active = isActiveRoute(pathname, item.href);
-                  return (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      className={`sidebar-link ${active ? 'active' : ''}`}
-                      data-module={item.module}
-                    >
-                      <span className="nav-mark">
-                        <Icon size={16} />
-                      </span>
-                      <span>{item.label}</span>
-                    </Link>
-                  );
-                })}
+      <div style={{ flex: 1, overflowY: 'auto', paddingTop: '8px' }}>
+        {navSections.map((section, si) => (
+          <div key={si} className="sidebar-section">
+            {section.title && (
+              <div
+                className="sidebar-section-title"
+                onClick={() => toggleSection(section.title!)}
+                style={{ cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+              >
+                <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  {sectionIconMap[section.title] || null}
+                  {section.title}
+                </span>
+                {collapsed[section.title!]
+                  ? <ChevronRight size={12} />
+                  : <ChevronDown size={12} />
+                }
               </div>
-            );
-          })}
-        </div>
-      </nav>
-    </>
+            )}
+            {!collapsed[section.title || ''] && section.items.map((item) => {
+              const isActive = pathname === item.href ||
+                (item.href !== '/dashboard' && pathname.startsWith(item.href));
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`sidebar-link ${section.title ? 'sidebar-sub' : ''} ${isActive ? 'active' : ''}`}
+                  data-module={item.module}
+                >
+                  <span style={{ display: 'flex', alignItems: 'center', opacity: 0.85 }}>
+                    {iconMap[item.label] || <LayoutDashboard size={ICON_SIZE} />}
+                  </span>
+                  {item.label}
+                </Link>
+              );
+            })}
+          </div>
+        ))}
+      </div>
+
+      <div style={{
+        padding: '16px 20px',
+        borderTop: '1px solid var(--border-default)',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '12px',
+      }}>
+        <Link href="/dashboard/profile" style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1, minWidth: 0, textDecoration: 'none', color: 'inherit' }}>
+          <div style={{
+            width: '36px',
+            height: '36px',
+            borderRadius: '10px',
+            background: 'linear-gradient(135deg, var(--accent-green), var(--accent-blue))',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '16px',
+            fontWeight: 700,
+            color: '#000',
+            flexShrink: 0,
+          }}>
+            {user?.name?.charAt(0) || '?'}
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: '13px', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {user?.name || 'Loading...'}
+            </div>
+            <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{user?.role || ''}</div>
+          </div>
+        </Link>
+        <button
+          onClick={toggleTheme}
+          style={{
+            background: 'none',
+            border: 'none',
+            color: 'var(--text-muted)',
+            cursor: 'pointer',
+            padding: '4px',
+            display: 'flex',
+            alignItems: 'center',
+          }}
+          title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+        >
+          {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+        </button>
+        <button
+          onClick={handleLogout}
+          style={{
+            background: 'none',
+            border: 'none',
+            color: 'var(--text-muted)',
+            cursor: 'pointer',
+            padding: '4px',
+            display: 'flex',
+            alignItems: 'center',
+          }}
+          title="Sign out"
+        >
+          <LogOut size={16} />
+        </button>
+      </div>
+    </nav>
   );
 }
