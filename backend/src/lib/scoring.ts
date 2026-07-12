@@ -5,11 +5,7 @@ export async function environmentalScore(departmentId: number): Promise<number> 
     where: { departmentId, status: { in: ['Active', 'On Track'] } },
   });
   if (goals.length === 0) return 100;
-<<<<<<< HEAD
   const totalProgress = goals.reduce((sum, g) => {
-=======
-  const totalProgress = goals.reduce((sum: number, g: { targetCO2: number; currentCO2: number }) => {
->>>>>>> 6d5a4978cf2bda29982894c348aaedf5b67bff33
     const progress = g.targetCO2 > 0 ? Math.min((1 - g.currentCO2 / g.targetCO2) * 100, 100) : 100;
     return sum + Math.max(progress, 0);
   }, 0);
@@ -24,11 +20,7 @@ export async function socialScore(departmentId: number): Promise<number> {
     where: { departmentId },
     select: { id: true },
   });
-<<<<<<< HEAD
   const employeeIds = employees.map(e => e.id);
-=======
-  const employeeIds = employees.map((e: { id: number }) => e.id);
->>>>>>> 6d5a4978cf2bda29982894c348aaedf5b67bff33
   if (employeeIds.length === 0) return 0;
 
   const approvedCount = await prisma.employeeParticipation.count({
@@ -143,8 +135,4 @@ export async function recalculateAllScores() {
   }
 
   return results;
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 6d5a4978cf2bda29982894c348aaedf5b67bff33

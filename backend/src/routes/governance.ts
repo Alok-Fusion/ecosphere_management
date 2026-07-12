@@ -1,14 +1,7 @@
-<<<<<<< HEAD
 import { Router, Request, Response } from 'express';
 import { prisma } from '../lib/prisma';
 import { requireAdmin, requireManager, AuthenticatedRequest } from '../middleware/auth';
 import { notifyComplianceIssue } from '../lib/notifications';
-=======
-import { Router, type Request, type Response } from 'express';
-import { prisma } from '../lib/prisma';
-import { requireAdmin, requireManager, type AuthenticatedRequest } from '../middleware/auth';
-import { notifyComplianceIssue } from '../lib/notification';
->>>>>>> 6d5a4978cf2bda29982894c348aaedf5b67bff33
 
 const router = Router();
 
@@ -65,11 +58,7 @@ router.post('/policy-acknowledgements', requireManager, async (req: Authenticate
 });
 
 // ── Audits Endpoints ──
-<<<<<<< HEAD
 router.get('/audits', async (req: Request, res: Response) => {
-=======
-router.get('/api/audits', async (req: Request, res: Response) => {
->>>>>>> 6d5a4978cf2bda29982894c348aaedf5b67bff33
   const audits = await prisma.audit.findMany({
     include: { department: true, auditor: true },
     orderBy: { date: 'desc' },
@@ -112,11 +101,7 @@ router.get('/compliance-issues', async (req: Request, res: Response) => {
     orderBy: { id: 'desc' },
   });
   const now = new Date();
-<<<<<<< HEAD
   const enriched = issues.map(issue => ({
-=======
-  const enriched = issues.map((issue: any) => ({
->>>>>>> 6d5a4978cf2bda29982894c348aaedf5b67bff33
     ...issue,
     isOverdue: issue.status === 'Open' && new Date(issue.dueDate) < now,
   }));

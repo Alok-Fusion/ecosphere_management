@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Dependencies
 node_modules/
 .pnp
@@ -40,8 +39,3 @@ Thumbs.db
 *.sw?
 AGENTS.md
 CLAUDE.md
-=======
-dist/
-node_modules
-.env
->>>>>>> 6d5a4978cf2bda29982894c348aaedf5b67bff33

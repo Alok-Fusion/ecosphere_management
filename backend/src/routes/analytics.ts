@@ -1,14 +1,6 @@
-<<<<<<< HEAD
 import { Router, Request, Response } from 'express';
 import { prisma } from '../lib/prisma';
 import { requireAuth, requireAdmin, AuthenticatedRequest } from '../middleware/auth';
-=======
-import { Router } from 'express';
-import type { Request, Response } from 'express';
-import { prisma } from '../lib/prisma';
-import { requireAuth, requireAdmin } from '../middleware/auth';
-import type { AuthenticatedRequest } from '../middleware/auth';
->>>>>>> 6d5a4978cf2bda29982894c348aaedf5b67bff33
 import { recalculateAllScores } from '../lib/scoring';
 
 const router = Router();
@@ -53,11 +45,7 @@ router.get('/dashboard', async (req: Request, res: Response) => {
     });
 
     const monthlyEmissions: Record<string, number> = {};
-<<<<<<< HEAD
     transactions.forEach(t => {
-=======
-    transactions.forEach((t: { transactionDate: Date; calculatedEmissions: number }) => {
->>>>>>> 6d5a4978cf2bda29982894c348aaedf5b67bff33
       const dateObj = new Date(t.transactionDate);
       const key = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}`;
       monthlyEmissions[key] = (monthlyEmissions[key] || 0) + t.calculatedEmissions;
@@ -91,21 +79,13 @@ router.get('/dashboard', async (req: Request, res: Response) => {
     });
 
     const recentActivity = [
-<<<<<<< HEAD
       ...recentParticipations.map(p => ({
-=======
-      ...recentParticipations.map((p: any) => ({
->>>>>>> 6d5a4978cf2bda29982894c348aaedf5b67bff33
         type: 'participation',
         text: `${p.employee.name} joined "${p.activity?.title || 'an activity'}"`,
         status: p.approvalStatus,
         time: p.completionDate.toISOString(),
       })),
-<<<<<<< HEAD
       ...recentIssues.map(i => ({
-=======
-      ...recentIssues.map((i: any) => ({
->>>>>>> 6d5a4978cf2bda29982894c348aaedf5b67bff33
         type: 'compliance',
         text: `Compliance issue: "${i.title}" — ${i.department.name}`,
         status: i.status,
@@ -186,45 +166,25 @@ router.get('/reports', async (req: Request, res: Response) => {
     let policies: any[] = [];
 
     if (!module || module === 'environmental') {
-<<<<<<< HEAD
       transactions = await prisma.carbonTransaction.findMany({
         where: {
           departmentId: deptFilter,
           transactionDate: getDateFilter(),
         },
-=======
-      const txnWhere: any = {};
-      if (deptFilter !== undefined) txnWhere.departmentId = deptFilter;
-      const dateFilter = getDateFilter();
-      if (dateFilter) txnWhere.transactionDate = dateFilter;
-      
-      transactions = await prisma.carbonTransaction.findMany({
-        where: txnWhere,
->>>>>>> 6d5a4978cf2bda29982894c348aaedf5b67bff33
         include: { department: true, emissionFactor: true },
         orderBy: { transactionDate: 'desc' },
       });
 
-<<<<<<< HEAD
       goals = await prisma.environmentalGoal.findMany({
         where: {
           departmentId: deptFilter,
           deadline: getDateFilter(),
         },
-=======
-      const goalWhere: any = {};
-      if (deptFilter !== undefined) goalWhere.departmentId = deptFilter;
-      if (dateFilter) goalWhere.deadline = dateFilter;
-      
-      goals = await prisma.environmentalGoal.findMany({
-        where: goalWhere,
->>>>>>> 6d5a4978cf2bda29982894c348aaedf5b67bff33
         include: { department: true },
       });
     }
 
     if (!module || module === 'social') {
-<<<<<<< HEAD
       participations = await prisma.employeeParticipation.findMany({
         where: {
           employeeId: empFilter,
@@ -233,59 +193,27 @@ router.get('/reports', async (req: Request, res: Response) => {
           employee: deptFilter ? { departmentId: deptFilter } : undefined,
           activity: catFilter ? { categoryId: catFilter } : undefined,
         },
-=======
-      const partWhere: any = {};
-      if (empFilter !== undefined) partWhere.employeeId = empFilter;
-      if (challFilter !== undefined) partWhere.challengeId = challFilter;
-      const dateFilter = getDateFilter();
-      if (dateFilter) partWhere.completionDate = dateFilter;
-      if (deptFilter !== undefined) partWhere.employee = { departmentId: deptFilter };
-      if (catFilter !== undefined) partWhere.activity = { categoryId: catFilter };
-      
-      participations = await prisma.employeeParticipation.findMany({
-        where: partWhere,
->>>>>>> 6d5a4978cf2bda29982894c348aaedf5b67bff33
         include: { employee: true, activity: true, challenge: true },
         orderBy: { completionDate: 'desc' },
       });
     }
 
     if (!module || module === 'governance') {
-<<<<<<< HEAD
       issues = await prisma.complianceIssue.findMany({
         where: {
           departmentId: deptFilter,
           ownerId: empFilter,
           dueDate: getDateFilter(),
         },
-=======
-      const issueWhere: any = {};
-      if (deptFilter !== undefined) issueWhere.departmentId = deptFilter;
-      if (empFilter !== undefined) issueWhere.ownerId = empFilter;
-      const dateFilter = getDateFilter();
-      if (dateFilter) issueWhere.dueDate = dateFilter;
-      
-      issues = await prisma.complianceIssue.findMany({
-        where: issueWhere,
->>>>>>> 6d5a4978cf2bda29982894c348aaedf5b67bff33
         include: { department: true, owner: true },
         orderBy: { dueDate: 'desc' },
       });
 
-<<<<<<< HEAD
       audits = await prisma.audit.findMany({
         where: {
           departmentId: deptFilter,
           date: getDateFilter(),
         },
-=======
-      const auditWhere: any = {};
-      if (deptFilter !== undefined) auditWhere.departmentId = deptFilter;
-      if (dateFilter) auditWhere.date = dateFilter;
-      
-      audits = await prisma.audit.findMany({
-        where: auditWhere,
->>>>>>> 6d5a4978cf2bda29982894c348aaedf5b67bff33
         include: { department: true, auditor: true },
         orderBy: { date: 'desc' },
       });
@@ -348,11 +276,7 @@ router.post('/insights/generate', async (req: Request, res: Response) => {
     let totalWeight = 0;
     let wEnv = 0, wSoc = 0, wGov = 0;
     for (const s of latestScores) {
-<<<<<<< HEAD
       const dept = departments.find(d => d.id === s.departmentId);
-=======
-      const dept = departments.find((d: any) => d.id === s.departmentId);
->>>>>>> 6d5a4978cf2bda29982894c348aaedf5b67bff33
       const w = dept?.employeeCount || 1;
       totalWeight += w;
       wEnv += s.environmentalScore * w;
@@ -368,11 +292,7 @@ router.post('/insights/generate', async (req: Request, res: Response) => {
 
     const prompt = `Given this ESG data: ${JSON.stringify({
       departmentScores: latestScores.map(s => ({
-<<<<<<< HEAD
         department: departments.find(d => d.id === s.departmentId)?.name,
-=======
-        department: departments.find((d: any) => d.id === s.departmentId)?.name,
->>>>>>> 6d5a4978cf2bda29982894c348aaedf5b67bff33
         environmental: s.environmentalScore,
         social: s.socialScore,
         governance: s.governanceScore,
@@ -405,8 +325,4 @@ router.post('/insights/generate', async (req: Request, res: Response) => {
   }
 });
 
-<<<<<<< HEAD
 export default router;
-=======
-export default router;
->>>>>>> 6d5a4978cf2bda29982894c348aaedf5b67bff33

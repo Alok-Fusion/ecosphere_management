@@ -1,11 +1,5 @@
-<<<<<<< HEAD
 import { Request, Response, NextFunction } from 'express';
 import { getSession, JWTPayload } from '../lib/auth';
-=======
-import type { Request, Response, NextFunction } from 'express';
-import { getSession } from '../lib/auth';
-import type { JWTPayload } from '../lib/auth';
->>>>>>> 6d5a4978cf2bda29982894c348aaedf5b67bff33
 
 export interface AuthenticatedRequest extends Request {
   user?: JWTPayload;
@@ -42,8 +36,4 @@ export function requireManager(req: AuthenticatedRequest, res: Response, next: N
   }
   req.user = session;
   next();
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 6d5a4978cf2bda29982894c348aaedf5b67bff33
