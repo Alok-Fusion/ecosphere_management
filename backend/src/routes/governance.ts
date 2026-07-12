@@ -1,6 +1,6 @@
-import { Router, Request, Response } from 'express';
+import { Router, type Request, type Response } from 'express';
 import { prisma } from '../lib/prisma';
-import { requireAdmin, requireManager, AuthenticatedRequest } from '../middleware/auth';
+import { requireAdmin, requireManager, type AuthenticatedRequest } from '../middleware/auth';
 import { notifyComplianceIssue } from '../lib/notification';
 
 const router = Router();
@@ -101,7 +101,7 @@ router.get('/compliance-issues', async (req: Request, res: Response) => {
     orderBy: { id: 'desc' },
   });
   const now = new Date();
-  const enriched = issues.map(issue => ({
+  const enriched = issues.map((issue: any) => ({
     ...issue,
     isOverdue: issue.status === 'Open' && new Date(issue.dueDate) < now,
   }));

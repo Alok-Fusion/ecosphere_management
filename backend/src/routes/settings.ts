@@ -1,6 +1,7 @@
 import { Router } from 'express';
-import { prisma } from '../prisma';
-import type { Response } from 'express';
+import { prisma } from '../lib/prisma';
+import type { Request, Response } from 'express';
+import { requireAdmin, requireAuth, type AuthenticatedRequest } from '../middleware/auth';
 
 
 const router = Router();
@@ -42,7 +43,7 @@ router.get('/badges', requireAuth, async (req: AuthenticatedRequest, res: Respon
   });
   return res.json({
     allBadges: badges,
-    userBadges: userBadges.map(ub => ub.badgeId),
+    userBadges: userBadges.map((ub: any) => ub.badgeId),
   });
 });
 
