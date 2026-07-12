@@ -1,6 +1,8 @@
-import { Router, Request, Response } from 'express';
+import { Router } from 'express';
+import type { Request, Response } from 'express';
 import { prisma } from '../lib/prisma';
-import { requireAuth, requireAdmin, AuthenticatedRequest } from '../middleware/auth';
+import { requireAuth, requireAdmin } from '../middleware/auth';
+import type { AuthenticatedRequest } from '../middleware/auth';
 import { recalculateAllScores } from '../lib/scoring';
 
 const router = Router();
@@ -45,7 +47,7 @@ router.get('/dashboard', async (req: Request, res: Response) => {
     });
 
     const monthlyEmissions: Record<string, number> = {};
-    transactions.forEach(t => {
+    transactions.forEach((t: { transactionDate: Date; calculatedEmissions: number }) => {
       const dateObj = new Date(t.transactionDate);
       const key = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}`;
       monthlyEmissions[key] = (monthlyEmissions[key] || 0) + t.calculatedEmissions;
@@ -79,13 +81,13 @@ router.get('/dashboard', async (req: Request, res: Response) => {
     });
 
     const recentActivity = [
-      ...recentParticipations.map(p => ({
+      ...recentParticipations.map((p: any) => ({
         type: 'participation',
         text: `${p.employee.name} joined "${p.activity?.title || 'an activity'}"`,
         status: p.approvalStatus,
         time: p.completionDate.toISOString(),
       })),
-      ...recentIssues.map(i => ({
+      ...recentIssues.map((i: any) => ({
         type: 'compliance',
         text: `Compliance issue: "${i.title}" — ${i.department.name}`,
         status: i.status,
@@ -276,7 +278,7 @@ router.post('/insights/generate', async (req: Request, res: Response) => {
     let totalWeight = 0;
     let wEnv = 0, wSoc = 0, wGov = 0;
     for (const s of latestScores) {
-      const dept = departments.find(d => d.id === s.departmentId);
+      const dept = departments.find((d: any) => d.id === s.departmentId);
       const w = dept?.employeeCount || 1;
       totalWeight += w;
       wEnv += s.environmentalScore * w;
@@ -292,7 +294,7 @@ router.post('/insights/generate', async (req: Request, res: Response) => {
 
     const prompt = `Given this ESG data: ${JSON.stringify({
       departmentScores: latestScores.map(s => ({
-        department: departments.find(d => d.id === s.departmentId)?.name,
+        department: departments.find((d: any) => d.id === s.departmentId)?.name,
         environmental: s.environmentalScore,
         social: s.socialScore,
         governance: s.governanceScore,

@@ -13,7 +13,7 @@ export async function checkAndAwardBadges(userId: number) {
     where: { userId },
     select: { badgeId: true },
   });
-  const existingBadgeIds = new Set(existingBadges.map(b => b.badgeId));
+  const existingBadgeIds = new Set(existingBadges.map((b: { badgeId: number }) => b.badgeId));
 
   const completedChallenges = await prisma.challengeParticipation.count({
     where: { employeeId: userId, approvalStatus: 'Approved' },
