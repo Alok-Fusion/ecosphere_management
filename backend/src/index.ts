@@ -5,7 +5,7 @@ import dotenv from 'dotenv';
 
 // Import sub-routers
 import authRouter from './routes/auth';
-import usersRouter from './routes/users';
+import usersRouter from './routes/user';
 import csrRouter from './routes/csr';
 import challengesRouter from './routes/challenges';
 import environmentalRouter from './routes/environmental';

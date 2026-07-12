@@ -168,54 +168,62 @@ router.get('/reports', async (req: Request, res: Response) => {
     let policies: any[] = [];
 
     if (!module || module === 'environmental') {
+      const txnWhere: any = {};
+      if (deptFilter !== undefined) txnWhere.departmentId = deptFilter;
+      const dateFilter = getDateFilter();
+      if (dateFilter) txnWhere.transactionDate = dateFilter;
+      
       transactions = await prisma.carbonTransaction.findMany({
-        where: {
-          departmentId: deptFilter,
-          transactionDate: getDateFilter(),
-        },
+        where: txnWhere,
         include: { department: true, emissionFactor: true },
         orderBy: { transactionDate: 'desc' },
       });
 
+      const goalWhere: any = {};
+      if (deptFilter !== undefined) goalWhere.departmentId = deptFilter;
+      if (dateFilter) goalWhere.deadline = dateFilter;
+      
       goals = await prisma.environmentalGoal.findMany({
-        where: {
-          departmentId: deptFilter,
-          deadline: getDateFilter(),
-        },
+        where: goalWhere,
         include: { department: true },
       });
     }
 
     if (!module || module === 'social') {
+      const partWhere: any = {};
+      if (empFilter !== undefined) partWhere.employeeId = empFilter;
+      if (challFilter !== undefined) partWhere.challengeId = challFilter;
+      const dateFilter = getDateFilter();
+      if (dateFilter) partWhere.completionDate = dateFilter;
+      if (deptFilter !== undefined) partWhere.employee = { departmentId: deptFilter };
+      if (catFilter !== undefined) partWhere.activity = { categoryId: catFilter };
+      
       participations = await prisma.employeeParticipation.findMany({
-        where: {
-          employeeId: empFilter,
-          challengeId: challFilter,
-          completionDate: getDateFilter(),
-          employee: deptFilter ? { departmentId: deptFilter } : undefined,
-          activity: catFilter ? { categoryId: catFilter } : undefined,
-        },
+        where: partWhere,
         include: { employee: true, activity: true, challenge: true },
         orderBy: { completionDate: 'desc' },
       });
     }
 
     if (!module || module === 'governance') {
+      const issueWhere: any = {};
+      if (deptFilter !== undefined) issueWhere.departmentId = deptFilter;
+      if (empFilter !== undefined) issueWhere.ownerId = empFilter;
+      const dateFilter = getDateFilter();
+      if (dateFilter) issueWhere.dueDate = dateFilter;
+      
       issues = await prisma.complianceIssue.findMany({
-        where: {
-          departmentId: deptFilter,
-          ownerId: empFilter,
-          dueDate: getDateFilter(),
-        },
+        where: issueWhere,
         include: { department: true, owner: true },
         orderBy: { dueDate: 'desc' },
       });
 
+      const auditWhere: any = {};
+      if (deptFilter !== undefined) auditWhere.departmentId = deptFilter;
+      if (dateFilter) auditWhere.date = dateFilter;
+      
       audits = await prisma.audit.findMany({
-        where: {
-          departmentId: deptFilter,
-          date: getDateFilter(),
-        },
+        where: auditWhere,
         include: { department: true, auditor: true },
         orderBy: { date: 'desc' },
       });

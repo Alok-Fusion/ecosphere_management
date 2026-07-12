@@ -19,17 +19,17 @@ router.get('/leaderboard', async (req: Request, res: Response) => {
     where: { status: 'Active' },
     include: { employees: { select: { xpTotal: true } } },
   });
-  const deptScores = departments.map(d => ({
+  const deptScores = departments.map((d: any) => ({
     id: d.id,
     name: d.name,
-    xp: d.employees.reduce((sum, e) => sum + e.xpTotal, 0),
+    xp: d.employees.reduce((sum: number, e: any) => sum + e.xpTotal, 0),
     type: 'department' as const,
-  })).sort((a, b) => b.xp - a.xp);
+  })).sort((a: any, b: any) => b.xp - a.xp);
 
   const combined = [
-    ...topUsers.map(u => ({ name: u.name, xp: u.xpTotal, type: 'user' as const, dept: u.department?.name })),
-    ...deptScores.map(d => ({ name: `${d.name} Dept`, xp: d.xp, type: 'department' as const, dept: undefined })),
-  ].sort((a, b) => b.xp - a.xp);
+    ...topUsers.map((u: any) => ({ name: u.name, xp: u.xpTotal, type: 'user' as const, dept: u.department?.name })),
+    ...deptScores.map((d: any) => ({ name: `${d.name} Dept`, xp: d.xp, type: 'department' as const, dept: undefined })),
+  ].sort((a: any, b: any) => b.xp - a.xp);
 
   return res.json(combined);
 });
@@ -56,7 +56,7 @@ router.get('/rewards', async (req: Request, res: Response) => {
 router.post('/rewards', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
   const { rewardId } = req.body;
   try {
-    const result = await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx: any) => {
       const reward = await tx.reward.findUnique({ where: { id: parseInt(rewardId) } });
       if (!reward) throw new Error('Reward not found');
       if (reward.stock <= 0) throw new Error('Out of stock');
@@ -154,7 +154,7 @@ router.delete('/categories', requireAdmin, async (req: AuthenticatedRequest, res
 router.get('/settings', async (req: Request, res: Response) => {
   const configs = await prisma.eSGConfig.findMany();
   const configMap: Record<string, string> = {};
-  configs.forEach(c => { configMap[c.key] = c.value; });
+  configs.forEach((c: any) => { configMap[c.key] = c.value; });
   return res.json(configMap);
 });
 

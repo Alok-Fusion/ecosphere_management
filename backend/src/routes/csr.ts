@@ -1,7 +1,9 @@
-import { Router, Request, Response } from 'express';
+import { Router } from 'express';
+import type { Request, Response } from 'express';
 import { prisma } from '../lib/prisma';
-import { requireAuth, requireManager, AuthenticatedRequest } from '../middleware/auth';
-import { notifyComplianceIssue, notifyParticipationApproved, notifyParticipationRejected } from '../lib/notifications';
+import { requireAuth, requireManager } from '../middleware/auth';
+import type { AuthenticatedRequest } from '../middleware/auth';
+import { notifyParticipationApproved, notifyParticipationRejected } from '../lib/notification';
 import { checkAndAwardBadges } from '../lib/badges';
 
 const router = Router();
@@ -54,8 +56,10 @@ router.post('/csr-activities/join', requireAuth, async (req: AuthenticatedReques
 
 router.get('/csr-activities/:id', async (req: Request, res: Response) => {
   try {
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    if (!id) return res.status(400).json({ error: 'ID parameter is required' });
     const activity = await prisma.cSRActivity.findUnique({
-      where: { id: parseInt(req.params.id) },
+      where: { id: parseInt(id) },
       include: { category: true, department: true },
     });
     if (!activity) return res.status(404).json({ error: 'Activity not found' });
