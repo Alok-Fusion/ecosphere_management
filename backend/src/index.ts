@@ -1,27 +1,40 @@
-import express, { type Express, type Request, type Response } from 'express';
-import cors from "cors";
+import express from 'express';
+import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import adminRouter from './routers/adminRouter';
+import dotenv from 'dotenv';
 
+// Import sub-routers
+import authRouter from './routes/auth';
+import usersRouter from './routes/users';
+import csrRouter from './routes/csr';
+import challengesRouter from './routes/challenges';
+import environmentalRouter from './routes/environmental';
+import governanceRouter from './routes/governance';
+import analyticsRouter from './routes/analytics';
+import settingsRouter from './routes/settings';
 
-const app: Express = express();
+dotenv.config();
 
-
+const app = express();
+const PORT = process.env.PORT || 5000;
 
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://127.0.0.1:3000', process.env.FRONTEND_URL!],
+  origin: true,
   credentials: true,
 }));
 app.use(express.json());
-
 app.use(cookieParser());
 
+// Mount Sub-routers
+app.use('/api/auth', authRouter);
+app.use('/api', usersRouter);
+app.use('/api', csrRouter);
+app.use('/api', challengesRouter);
+app.use('/api', environmentalRouter);
+app.use('/api', governanceRouter);
+app.use('/api', analyticsRouter);
+app.use('/api', settingsRouter);
 
-app.get('/', (req: Request, res: Response) => {
-  res.send('Hello World!');
+app.listen(PORT, () => {
+  console.log(`🚀 EcoSphere API Server running on port ${PORT}`);
 });
-
-
-app.use("/api/admin", adminRouter)
-
-app.listen(4000, () => console.log("Server running on 4000"));
