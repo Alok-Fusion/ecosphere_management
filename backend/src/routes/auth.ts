@@ -1,7 +1,16 @@
+<<<<<<< HEAD
 import { Router, Request, Response } from 'express';
 import { prisma } from '../lib/prisma';
 import { hashPassword, verifyPassword, signToken } from '../lib/auth';
 import { requireAuth, AuthenticatedRequest } from '../middleware/auth';
+=======
+import { Router } from 'express';
+import type { Request, Response } from 'express';
+import { prisma } from '../lib/prisma';
+import { hashPassword, verifyPassword, signToken } from '../lib/auth';
+import { requireAuth } from '../middleware/auth';
+import type { AuthenticatedRequest } from '../middleware/auth';
+>>>>>>> 6d5a4978cf2bda29982894c348aaedf5b67bff33
 
 const router = Router();
 
@@ -95,4 +104,8 @@ router.get('/me', requireAuth, async (req: AuthenticatedRequest, res: Response) 
   return res.json({ user });
 });
 
+<<<<<<< HEAD
 export default router;
+=======
+export default router;
+>>>>>>> 6d5a4978cf2bda29982894c348aaedf5b67bff33

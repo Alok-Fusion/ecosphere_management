@@ -1,6 +1,10 @@
-import bcrypt from 'bcryptjs';
+import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+<<<<<<< HEAD
 import { Request } from 'express';
+=======
+import type { Request } from 'express';
+>>>>>>> 6d5a4978cf2bda29982894c348aaedf5b67bff33
 
 const JWT_SECRET = process.env.JWT_SECRET || 'ecosphere-default-secret';
 

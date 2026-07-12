@@ -1,5 +1,9 @@
 import { prisma } from './lib/prisma';
+<<<<<<< HEAD
 import bcrypt from 'bcryptjs';
+=======
+import bcrypt from 'bcrypt';
+>>>>>>> 6d5a4978cf2bda29982894c348aaedf5b67bff33
 
 async function main() {
   console.log('🌱 Seeding EcoSphere backend database...');
@@ -556,8 +560,13 @@ async function main() {
   const emissionValues = [450, 420, 410, 395, 380, 370, 355, 340, 330, 315, 300, 285];
 
   for (let i = 0; i < months.length; i++) {
+<<<<<<< HEAD
     const { month, year } = months[i];
     const quantity = emissionValues[i];
+=======
+    const { month, year } = months[i] || { month: 1, year: 2024 };
+    const quantity = emissionValues[i] || 400;
+>>>>>>> 6d5a4978cf2bda29982894c348aaedf5b67bff33
     await prisma.carbonTransaction.create({
       data: {
         departmentId: manufacturing.id,
@@ -571,7 +580,11 @@ async function main() {
   }
 
   for (let i = 0; i < months.length; i++) {
+<<<<<<< HEAD
     const { month, year } = months[i];
+=======
+    const { month, year } = months[i] || { month: 1, year: 2024 };
+>>>>>>> 6d5a4978cf2bda29982894c348aaedf5b67bff33
     await prisma.carbonTransaction.create({
       data: {
         departmentId: logistics.id,

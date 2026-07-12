@@ -1,9 +1,21 @@
+<<<<<<< HEAD
 import { Router, Request, Response } from 'express';
 import { prisma } from '../lib/prisma';
 import { requireAuth, requireAdmin, AuthenticatedRequest } from '../middleware/auth';
 
 const router = Router();
 
+=======
+import { Router } from 'express';
+import { prisma } from '../lib/prisma';
+import type { Request, Response } from 'express';
+import { requireAdmin, requireAuth, type AuthenticatedRequest } from '../middleware/auth';
+
+
+const router = Router();
+
+
+>>>>>>> 6d5a4978cf2bda29982894c348aaedf5b67bff33
 // ── Leaderboard Endpoints ──
 router.get('/leaderboard', async (req: Request, res: Response) => {
   const topUsers = await prisma.user.findMany({
@@ -16,6 +28,7 @@ router.get('/leaderboard', async (req: Request, res: Response) => {
     where: { status: 'Active' },
     include: { employees: { select: { xpTotal: true } } },
   });
+<<<<<<< HEAD
   const deptScores = departments.map(d => ({
     id: d.id,
     name: d.name,
@@ -27,6 +40,19 @@ router.get('/leaderboard', async (req: Request, res: Response) => {
     ...topUsers.map(u => ({ name: u.name, xp: u.xpTotal, type: 'user' as const, dept: u.department?.name })),
     ...deptScores.map(d => ({ name: `${d.name} Dept`, xp: d.xp, type: 'department' as const, dept: undefined })),
   ].sort((a, b) => b.xp - a.xp);
+=======
+  const deptScores = departments.map((d: any) => ({
+    id: d.id,
+    name: d.name,
+    xp: d.employees.reduce((sum: number, e: any) => sum + e.xpTotal, 0),
+    type: 'department' as const,
+  })).sort((a: any, b: any) => b.xp - a.xp);
+
+  const combined = [
+    ...topUsers.map((u: any) => ({ name: u.name, xp: u.xpTotal, type: 'user' as const, dept: u.department?.name })),
+    ...deptScores.map((d: any) => ({ name: `${d.name} Dept`, xp: d.xp, type: 'department' as const, dept: undefined })),
+  ].sort((a: any, b: any) => b.xp - a.xp);
+>>>>>>> 6d5a4978cf2bda29982894c348aaedf5b67bff33
 
   return res.json(combined);
 });
@@ -40,7 +66,11 @@ router.get('/badges', requireAuth, async (req: AuthenticatedRequest, res: Respon
   });
   return res.json({
     allBadges: badges,
+<<<<<<< HEAD
     userBadges: userBadges.map(ub => ub.badgeId),
+=======
+    userBadges: userBadges.map((ub: any) => ub.badgeId),
+>>>>>>> 6d5a4978cf2bda29982894c348aaedf5b67bff33
   });
 });
 
@@ -53,7 +83,11 @@ router.get('/rewards', async (req: Request, res: Response) => {
 router.post('/rewards', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
   const { rewardId } = req.body;
   try {
+<<<<<<< HEAD
     const result = await prisma.$transaction(async (tx) => {
+=======
+    const result = await prisma.$transaction(async (tx: any) => {
+>>>>>>> 6d5a4978cf2bda29982894c348aaedf5b67bff33
       const reward = await tx.reward.findUnique({ where: { id: parseInt(rewardId) } });
       if (!reward) throw new Error('Reward not found');
       if (reward.stock <= 0) throw new Error('Out of stock');
@@ -125,6 +159,10 @@ router.delete('/departments', requireAdmin, async (req: AuthenticatedRequest, re
   return res.json({ success: true });
 });
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 6d5a4978cf2bda29982894c348aaedf5b67bff33
 // ── Categories CRUD ──
 router.get('/categories', async (req: Request, res: Response) => {
   const categories = await prisma.category.findMany({ orderBy: { name: 'asc' } });
@@ -150,7 +188,11 @@ router.delete('/categories', requireAdmin, async (req: AuthenticatedRequest, res
 router.get('/settings', async (req: Request, res: Response) => {
   const configs = await prisma.eSGConfig.findMany();
   const configMap: Record<string, string> = {};
+<<<<<<< HEAD
   configs.forEach(c => { configMap[c.key] = c.value; });
+=======
+  configs.forEach((c: any) => { configMap[c.key] = c.value; });
+>>>>>>> 6d5a4978cf2bda29982894c348aaedf5b67bff33
   return res.json(configMap);
 });
 
@@ -166,4 +208,8 @@ router.patch('/settings', requireAdmin, async (req: AuthenticatedRequest, res: R
   return res.json({ success: true });
 });
 
+<<<<<<< HEAD
 export default router;
+=======
+export default router;
+>>>>>>> 6d5a4978cf2bda29982894c348aaedf5b67bff33

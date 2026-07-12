@@ -1,7 +1,14 @@
+<<<<<<< HEAD
 import { Router, Request, Response } from 'express';
 import { prisma } from '../lib/prisma';
 import { requireAuth, requireAdmin, AuthenticatedRequest } from '../middleware/auth';
 import { notifyParticipationApproved, notifyParticipationRejected } from '../lib/notifications';
+=======
+import { Router, type Request, type Response } from 'express';
+import { prisma } from '../lib/prisma';
+import { requireAuth, requireAdmin, type AuthenticatedRequest } from '../middleware/auth';
+import { notifyParticipationApproved, notifyParticipationRejected } from '../lib/notification';
+>>>>>>> 6d5a4978cf2bda29982894c348aaedf5b67bff33
 import { checkAndAwardBadges } from '../lib/badges';
 
 const router = Router();
@@ -17,6 +24,14 @@ router.get('/challenges', async (req: Request, res: Response) => {
 
 router.get('/challenges/:id', async (req: Request, res: Response) => {
   try {
+<<<<<<< HEAD
+=======
+    if (typeof(req.params.id) != "string") {
+      return res.status(410).json({
+        "msg": "No id provided"
+      });
+    }
+>>>>>>> 6d5a4978cf2bda29982894c348aaedf5b67bff33
     const challenge = await prisma.challenge.findUnique({
       where: { id: parseInt(req.params.id) },
       include: { category: true },
@@ -172,4 +187,8 @@ router.patch('/challenge-participations', async (req: Request, res: Response) =>
   return res.json(updated);
 });
 
+<<<<<<< HEAD
 export default router;
+=======
+export default router;
+>>>>>>> 6d5a4978cf2bda29982894c348aaedf5b67bff33

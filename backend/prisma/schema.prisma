@@ -3,7 +3,11 @@ generator client {
 }
 
 datasource db {
+<<<<<<< HEAD
   provider = "sqlite"
+=======
+  provider = "postgresql"
+>>>>>>> 6d5a4978cf2bda29982894c348aaedf5b67bff33
   url      = env("DATABASE_URL")
 }
 
@@ -283,4 +287,8 @@ model ESGConfig {
   id    Int    @id @default(autoincrement())
   key   String @unique
   value String
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 6d5a4978cf2bda29982894c348aaedf5b67bff33

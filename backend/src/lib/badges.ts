@@ -1,5 +1,10 @@
+<<<<<<< HEAD
 import { prisma } from './prisma';
 import { notifyBadgeUnlocked } from './notifications';
+=======
+import { notifyBadgeUnlocked } from './notification';
+import { prisma } from './prisma';
+>>>>>>> 6d5a4978cf2bda29982894c348aaedf5b67bff33
 
 export async function checkAndAwardBadges(userId: number) {
   const configToggle = await prisma.eSGConfig.findUnique({ where: { key: 'auto_award_badges' } });
@@ -13,7 +18,11 @@ export async function checkAndAwardBadges(userId: number) {
     where: { userId },
     select: { badgeId: true },
   });
+<<<<<<< HEAD
   const existingBadgeIds = new Set(existingBadges.map(b => b.badgeId));
+=======
+  const existingBadgeIds = new Set(existingBadges.map((b: { badgeId: number }) => b.badgeId));
+>>>>>>> 6d5a4978cf2bda29982894c348aaedf5b67bff33
 
   const completedChallenges = await prisma.challengeParticipation.count({
     where: { employeeId: userId, approvalStatus: 'Approved' },
@@ -41,4 +50,8 @@ export async function checkAndAwardBadges(userId: number) {
   }
 
   return newBadges;
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 6d5a4978cf2bda29982894c348aaedf5b67bff33
