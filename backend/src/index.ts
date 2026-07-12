@@ -9,7 +9,7 @@ const app: Express = express();
 
 
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://127.0.0.1:3000'],
+  origin: ['http://localhost:3000', 'http://127.0.0.1:3000', process.env.FRONTEND_URL!],
   credentials: true,
 }));
 app.use(express.json());
@@ -24,4 +24,4 @@ app.get('/', (req: Request, res: Response) => {
 
 app.use("/api/admin", adminRouter)
 
-app.listen(3000, () => console.log("Server running on 3000"));
+app.listen(4000, () => console.log("Server running on 4000"));
