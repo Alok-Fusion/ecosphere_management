@@ -1,5 +1,5 @@
-import { prisma } from '../prisma';
 import { notifyBadgeUnlocked } from './notification';
+import { prisma } from './prisma';
 
 export async function checkAndAwardBadges(userId: number) {
   const configToggle = await prisma.eSGConfig.findUnique({ where: { key: 'auto_award_badges' } });

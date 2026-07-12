@@ -1,4 +1,4 @@
-import { prisma } from '../prisma';
+import { prisma } from './prisma';
 
 export async function environmentalScore(departmentId: number): Promise<number> {
   const goals = await prisma.environmentalGoal.findMany({
