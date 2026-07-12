@@ -14,8 +14,34 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model User {
-  id String @id @default(uuid())
-  name String
+  id            Int         @id @default(autoincrement())
+  name          String
+  email         String      @unique
+  passwordHash  String
+  role          String      @default("Employee") // Admin | Employee
+  departmentId  Int?
+  department    Department? @relation("DepartmentEmployees", fields: [departmentId], references: [id])
+  xpTotal       Int         @default(0)
+  pointsBalance Int         @default(0)
+  status        String      @default("Active") // Active | Inactive
+  createdAt     DateTime    @default(now())
+
+  headOfDepartments Department[] @relation("DepartmentHead")
+  departments       Department[]
+}
+
+model Department {
+  id                 Int    @id @default(autoincrement())
+  name               String
+  code               String @unique
+  headUserId         Int?
+  head               User?  @relation("DepartmentHead", fields: [headUserId], references: [id])
+  parentDepartmentId Int?
+  employeeCount      Int    @default(0)
+  status             String @default("Active") // Active | Inactive
+
+  employees User[] @relation("DepartmentEmployees")
+  user      User?  @relation(fields: [userId], references: [id])
+  userId    Int?
 }
